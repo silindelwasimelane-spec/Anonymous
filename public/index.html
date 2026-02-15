@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anonymous Messages</title>
+  <link rel="stylesheet" href="/styles.css">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body>
+  <main class="container">
+    <h1>Anonymous Messages</h1>
+    <p><a href="/signup">Sign up</a> • <a href="/login">Log in</a> • <a href="/account">Your account</a></p>
+
+    <section id="sendSection" style="margin: 24px 0; padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(200, 100, 255, 0.3);">
+      <h2>Send an anonymous message</h2>
+      <p>Paste a recipient link to send them a message (no account needed):</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <input type="text" id="recipientInput" placeholder="Paste recipient link or ID here" style="flex: 1; min-width: 250px; padding: 8px 12px; border: 1px solid rgba(200, 100, 255, 0.5); border-radius: 4px; background: rgba(255, 255, 255, 0.05); color: inherit;">
+        <button id="goToSend" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold;">Send message</button>
+      </div>
+      <div id="sendStatus" style="margin-top: 8px; color: #ff6b6b;"></div>
+    </section>
+
+    <section id="messages">
+      <h2>Recent messages (public)</h2>
+      <div id="list"></div>
+    </section>
+  </main>
+  <footer class="dev-footer"><strong>SiyamThanda SimeLane</strong></footer>
+  <script src="/app.js"></script>
+  <script>
+    // Handle recipient link input and navigation to send page
+    document.getElementById('goToSend').addEventListener('click', () => {
+      const input = document.getElementById('recipientInput').value.trim();
+      const status = document.getElementById('sendStatus');
+      status.textContent = '';
+      
+      if (!input) {
+        status.textContent = 'Please enter a recipient link or ID';
+        return;
+      }
+      
+      // Parse the input - could be:
+      // - Full URL: http://localhost:3000/u/abc123
+      // - Path: /u/abc123
+      // - Just ID: abc123
+      let recipientId = input;
+      
+      if (input.includes('/u/')) {
+        // Extract ID from URL or path
+        const match = input.match(/\/u\/([a-f0-9]+)/);
+        if (match && match[1]) {
+          recipientId = match[1];
+        } else {
+          status.textContent = 'Invalid recipient link format';
+          return;
+        }
+      } else if (input.match(/^[a-f0-9]{12}$/)) {
+        // Valid hex ID (12 chars from secrets.token_hex(6))
+        recipientId = input;
+      } else {
+        status.textContent = 'Invalid recipient ID or link';
+        return;
+      }
+      
+      // Redirect to send page
+      window.location.href = `/u/${recipientId}`;
+    });
+    
+    // Allow Enter key to submit
+    document.getElementById('recipientInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('goToSend').click();
+      }
+    });
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

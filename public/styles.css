@@ -1,0 +1,88 @@
+:root{
+	--bg:#071226;
+	--card:#081827;
+	--muted:#9aa4b2;
+	--accent:#7dd3fc;
+	--glow:#3ee7ff;
+	--accent-2:#9b7dff;
+	--text:#e6eef6;
+	--primary-btn-1:#667eea;
+	--primary-btn-2:#764ba2;
+}
+
+body.light-theme {
+	/* Minimal light theme: change only background/text/muted colors.
+	   Preserve accent and primary button colors so purple highlights remain. */
+	--bg: #f8f9fa !important;
+	--card: #ffffff !important;
+	--text: #1a1a1a !important;
+	--muted: #666666 !important;
+}
+
+*{box-sizing:border-box}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);color:var(--text);padding:40px;transition:background 0.3s, color 0.3s}
+body.light-theme{background:linear-gradient(180deg,#f0f3f7,#fafbfc) !important;color:var(--text) !important}
+.container{max-width:980px;margin:0 auto}
+h1{margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)}
+body.light-theme h1{text-shadow:0 2px 4px rgba(0,0,0,0.1) !important}
+main{padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+body.light-theme main{background:white !important;box-shadow:0 2px 8px rgba(0,0,0,0.08) !important}
+label{display:block;margin-bottom:6px;color:var(--muted);font-size:14px}
+input, textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,0.5), 0 0 12px rgba(125,211,252,0.03) inset}
+body.light-theme input, body.light-theme textarea{border:1px solid #ddd !important;background:#f9f9f9 !important;box-shadow:0 1px 3px rgba(0,0,0,0.05) !important;color:var(--text) !important}
+textarea{min-height:120px}
+.row{display:flex;gap:12px;align-items:center;margin-top:12px}
+button{background:linear-gradient(90deg,var(--primary-btn-1),var(--primary-btn-2));border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(125,211,252,0.12), 0 0 18px rgba(155,125,255,0.08);transition:transform 0.2s}
+button:hover{transform:translateY(-2px)}
+#messages{margin-top:22px}
+.message{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;margin-bottom:12px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+body.light-theme .message{background:#f5f5f5 !important;box-shadow:0 1px 3px rgba(0,0,0,0.05) !important}
+.meta{font-size:12px;color:var(--muted);margin-bottom:8px}
+.body{white-space:pre-wrap}
+.small{font-size:13px;color:var(--muted)}
+.center{display:flex;align-items:center;gap:8px}
+.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--glow);box-shadow:0 4px 16px rgba(0,0,0,0.5)}
+body.light-theme .pill{background:#e8f0ff !important;color:var(--primary-btn-1) !important}
+
+.dev-footer{margin-top:40px;padding:18px 0 6px;color:var(--muted);text-align:center;font-size:14px}
+.dev-footer strong{color:#ffffff;font-weight:800;letter-spacing:0.4px}
+body.light-theme .dev-footer strong{color:#333 !important}
+
+a{color:var(--primary-btn-1)}
+body.light-theme a{color:var(--primary-btn-1) !important}
+
+nav {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	margin-bottom: 24px;
+	padding: 12px;
+	background: rgba(102,126,234,0.1);
+	border-radius: 8px;
+	flex-wrap: wrap;
+}
+body.light-theme nav {
+	background: #f0f3f7;
+}
+nav a, nav button {
+	text-decoration: none;
+	color: var(--primary-btn-1);
+	cursor: pointer;
+	font-weight: 500;
+	font-size: 14px;
+	background: none;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 6px;
+	transition: background 0.2s;
+}
+nav a:hover, nav button:hover {
+	background: rgba(102,126,234,0.2);
+}
+body.light-theme nav a, body.light-theme nav button {
+	color: var(--primary-btn-1);
+}
+.nav-spacer {
+	margin-left: auto;
+}
+

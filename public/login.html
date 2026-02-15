@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body style="margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);background-attachment:fixed;min-height:100vh;color:#e6eef6;padding:40px">
+  <main style="max-width:640px;margin:32px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+    <h1 style="margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)">Login</h1>
+    <form id="login">
+      <div><label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Username</label><input id="li_user" autocomplete="username" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset"></div>
+      <div><label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Password</label><input id="li_pass" type="password" autocomplete="current-password" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset"></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px"><button style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Login</button><span id="li_status"></span></div>
+    </form>
+    <p style="color:#9aa4b2">Don't have an account? <a href="/signup" style="color:#667eea;text-decoration:none;font-weight:bold">Sign up</a></p>
+  </main>
+  <script>
+    async function post(url, body){
+      const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), credentials: 'same-origin'});
+      return res;
+    }
+    document.getElementById('login').addEventListener('submit', async (e)=>{
+      e.preventDefault(); const u=document.getElementById('li_user').value, p=document.getElementById('li_pass').value;
+      const st = document.getElementById('li_status'); st.textContent='...';
+      const r = await post('/api/login', {username:u,password:p});
+      const j = await r.json().catch(()=>({error:'failed'}));
+      if (r.ok) { try { localStorage.setItem('am_user', u); localStorage.setItem('am_recipient', j.recipientLink || ''); } catch(e){}; st.innerHTML = 'Logged in. <a href="/account">Go to account</a>'; setTimeout(()=> window.location.href = '/account', 200); }
+      else st.textContent = 'Error: ' + (j.error||r.statusText);
+    });
+  </script>
+  <script src="nav.js"></script>
+  <footer class="dev-footer"><strong>SiyamThanda SimeLane</strong></footer>
+</body>
+</html>

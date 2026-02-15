@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Account</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>main{max-width:760px;margin:24px auto}</style>
+</head>
+<body style="margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);background-attachment:fixed;min-height:100vh;color:#e6eef6;padding:40px">
+  <main style="max-width:760px;margin:24px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+    <h1 style="margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)">Your account</h1>
+
+    <section>
+      <p style="color:#9aa4b2">To manage your messages, <a href="/login" style="color:#667eea;text-decoration:none;font-weight:bold">log in</a> or <a href="/signup" style="color:#667eea;text-decoration:none;font-weight:bold">create an account</a>.</p>
+    </section>
+
+    <!-- Tab buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;border-bottom:2px solid rgba(102,126,234,0.2);padding-bottom:0;flex-wrap:wrap">
+      <button class="tab-btn" data-tab="account" style="background:none;border:none;padding:12px 0;color:#667eea;cursor:pointer;font-weight:bold;font-size:14px;border-bottom:3px solid #667eea;margin-bottom:-2px">Account</button>
+      <button class="tab-btn" data-tab="inbox" style="background:none;border:none;padding:12px 0;color:#9aa4b2;cursor:pointer;font-weight:bold;font-size:14px;border-bottom:3px solid transparent;margin-bottom:-2px">Inbox</button>
+      <button class="tab-btn" data-tab="settings" style="background:none;border:none;padding:12px 0;color:#9aa4b2;cursor:pointer;font-weight:bold;font-size:14px;border-bottom:3px solid transparent;margin-bottom:-2px">Settings</button>
+      <button id="logoutBtn" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold;margin-left:auto">Logout</button>
+    </div>
+
+    <!-- Account Details Tab -->
+    <section id="accountTab" class="tab-content" style="display:block">
+      <h2 style="font-size:20px;margin-bottom:16px">Account details</h2>
+      <div id="recipientLink"></div>
+    </section>
+
+    <!-- Inbox Tab -->
+    <section id="inboxTab" class="tab-content" style="display:none">
+      <h2 style="font-size:20px;margin-bottom:16px">Your inbox</h2>
+      <p style="color:#9aa4b2;margin-bottom:16px">Messages sent to your recipient link will appear here.</p>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <button id="refreshBtn" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Refresh</button>
+        <span id="inbox_status" style="font-size:13px;color:#9aa4b2"></span>
+      </div>
+      <div id="inboxContent"></div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section id="settingsTab" class="tab-content" style="display:none">
+      <h2 style="font-size:20px;margin-bottom:16px">Settings</h2>
+      
+      <!-- Theme Selector -->
+      <div style="margin-bottom:20px;padding:16px;background:rgba(102,126,234,0.1);border-radius:12px;border:1px solid rgba(102,126,234,0.3)">
+        <h3 style="font-size:16px;margin-top:0;margin-bottom:12px">🎨 Appearance</h3>
+        <label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Theme</label>
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <button id="themeBtn" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Toggle Theme (Dark/Light)</button>
+          <span id="theme_status" style="font-size:13px;color:#9aa4b2"></span>
+        </div>
+      </div>
+
+      <!-- Recipient Link Controls -->
+      <div style="margin-bottom:20px;padding:16px;background:rgba(102,126,234,0.1);border-radius:12px;border:1px solid rgba(102,126,234,0.3)">
+        <h3 style="font-size:16px;margin-top:0;margin-bottom:12px">🔗 Recipient Link</h3>
+        <p style="color:#9aa4b2;font-size:14px;margin:0 0 12px">Control who can send you messages through your link.</p>
+        <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+          <button id="toggleLinkBtn" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Enable/Disable Link</button>
+          <button id="regenerateLinkBtn" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Generate New Link</button>
+          <span id="link_status" style="font-size:13px;color:#9aa4b2"></span>
+        </div>
+        <div style="padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(102,126,234,0.2);font-size:13px">
+          <div style="margin-bottom:6px">Status: <strong id="linkStatus">Loading...</strong></div>
+          <div>Reward Balance: <strong id="rewardBalance">R0</strong></div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom:20px;padding:16px;background:rgba(102,126,234,0.1);border-radius:12px;border:1px solid rgba(102,126,234,0.3)">
+        <h3 style="font-size:16px;margin-top:0;margin-bottom:12px">Change password</h3>
+        <form id="changePasswordForm" style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Current password</label>
+            <input id="cp_current" type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(102,126,234,0.4);background:rgba(255,255,255,0.02);color:inherit;font-size:14px">
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">New password</label>
+            <input id="cp_new" type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(102,126,234,0.4);background:rgba(255,255,255,0.02);color:inherit;font-size:14px">
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="submit" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Change password</button>
+            <span id="cp_status" style="font-size:13px;color:#9aa4b2"></span>
+          </div>
+        </form>
+      </div>
+
+      <div style="padding:16px;background:rgba(255,100,100,0.1);border-radius:12px;border:1px solid rgba(255,100,100,0.3)">
+        <h3 style="font-size:16px;margin-top:0;margin-bottom:12px;color:#ff6b6b">Delete account</h3>
+        <p style="color:#9aa4b2;font-size:14px;margin:0 0 12px">This action cannot be undone. All your messages and data will be permanently deleted.</p>
+        <form id="deleteAccountForm" style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Enter your password to confirm deletion</label>
+            <input id="da_password" type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,100,100,0.4);background:rgba(255,255,255,0.02);color:inherit;font-size:14px">
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="submit" style="background:linear-gradient(90deg, #ff6b6b, #ee5a52);border:none;padding:8px 14px;border-radius:8px;color:white;cursor:pointer;font-size:14px;font-weight:bold">Delete account</button>
+            <span id="da_status" style="font-size:13px;color:#9aa4b2"></span>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer style="margin-top:40px;padding:18px 0 6px;color:#9aa4b2;text-align:center;font-size:14px"><strong style="color:#ffffff;font-weight:800;letter-spacing:0.4px">SiyamThanda SimeLane</strong></footer>
+  <script>
+    async function post(url, body){
+      const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+      return res;
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        // Show selected tab
+        document.getElementById(tab + 'Tab').style.display = 'block';
+        // Update active tab styling
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.style.color = '#9aa4b2';
+          b.style.borderBottomColor = 'transparent';
+        });
+        btn.style.color = '#667eea';
+        btn.style.borderBottomColor = '#667eea';
+        // Load content if needed
+        if (tab === 'inbox') {
+          loadInboxMessages();
+        }
+      });
+    });
+
+    // Logout handler
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      fetch('/api/logout', {method:'POST', credentials: 'same-origin'}).finally(() => {
+        window.location.href = '/';
+      });
+    });
+
+    // Auto-load account info
+    window.addEventListener('load', async () => {
+      try {
+        const r = await fetch('/api/account/info', {credentials: 'same-origin'});
+        const j = await r.json().catch(() => ({error:'failed'}));
+        if (r.ok) {
+          // Apply saved theme
+          const savedTheme = localStorage.getItem('theme') || j.theme || 'dark';
+          if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+          }
+          
+          // show recipient link and referral code clearly
+          const rl = document.getElementById('recipientLink');
+          rl.innerHTML = '';
+          const linkEl = document.createElement('div');
+          linkEl.innerHTML = 'Your recipient link: <a id="recipientHref" href="'+j.recipientLink+'" target="_blank" style="color:#667eea;text-decoration:none;font-weight:bold">'+j.recipientLink+'</a>';
+          const codeEl = document.createElement('div');
+          codeEl.innerHTML = 'Your referral code: <strong id="refCode">'+ (j.referralCode || '') + '</strong>';
+          codeEl.style.marginTop = '12px';
+          const statsEl = document.createElement('div');
+          statsEl.innerHTML = 'Referrals: <strong>'+j.referrals+'</strong> &nbsp; Rewards: <strong>R'+j.rewardsR+'</strong>';
+          statsEl.style.marginTop = '12px';
+          statsEl.style.color = '#9aa4b2';
+          // share buttons
+          const shareEl = document.createElement('div');
+          shareEl.style.display = 'flex';
+          shareEl.style.gap = '12px';
+          shareEl.style.marginTop = '16px';
+          shareEl.style.flexWrap = 'wrap';
+          shareEl.innerHTML = `
+            <button id="copyLink" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Copy link</button>
+            <button id="shareWhatsApp" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Share to WhatsApp</button>
+            <button id="downloadQR" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Download QR</button>
+            <span id="share_status" style="font-size:13px;color:#9aa4b2"></span>
+          `;
+          rl.appendChild(linkEl); rl.appendChild(codeEl); rl.appendChild(statsEl); rl.appendChild(shareEl);
+          // QR placeholder
+          const qrWrap = document.createElement('div'); qrWrap.style.marginTop='12px'; qrWrap.id='qrWrap'; rl.appendChild(qrWrap);
+          // setup share buttons
+          document.getElementById('copyLink').addEventListener('click', () => {
+            const url = window.location.origin + document.getElementById('recipientHref').getAttribute('href');
+            navigator.clipboard.writeText(url).then(() => { document.getElementById('share_status').textContent='Link copied'; }).catch(() => { document.getElementById('share_status').textContent='Copy failed'; });
+          });
+          document.getElementById('shareWhatsApp').addEventListener('click', () => {
+            const url = window.location.origin + document.getElementById('recipientHref').getAttribute('href');
+            const shareUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent('Send me an anonymous message: ' + url);
+            window.open(shareUrl, '_blank');
+          });
+          document.getElementById('downloadQR').addEventListener('click', () => {
+            const url = window.location.origin + document.getElementById('recipientHref').getAttribute('href');
+            const qr = document.getElementById('qrImage');
+            if (!qr) return;
+            const a = document.createElement('a'); a.href = qr.src; a.download = 'referral-qr.png'; document.body.appendChild(a); a.click(); a.remove();
+          });
+          // generate QR image using Google Chart API
+          const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=' + encodeURIComponent(window.location.origin + document.getElementById('recipientHref').getAttribute('href'));
+          const qrImg = document.createElement('img'); qrImg.id='qrImage'; qrImg.src = qrUrl; qrImg.alt='QR code'; qrImg.style.maxWidth='200px'; qrImg.style.marginTop='8px'; document.getElementById('qrWrap').appendChild(qrImg);
+          
+          // Update Settings tab fields
+          document.getElementById('linkStatus').textContent = j.linkActive ? 'Active ✅' : 'Disabled 🚫';
+          document.getElementById('rewardBalance').textContent = 'R' + (j.rewardBalance || 0);
+        }
+      } catch(e){ console.error(e); }
+    });
+
+    // Load inbox messages
+    async function loadInboxMessages() {
+      const status = document.getElementById('inbox_status');
+      status.textContent = 'loading...';
+      try {
+        const r = await fetch('/api/account/messages', {credentials: 'same-origin'});
+        const j = await r.json().catch(() => ({error:'failed'}));
+        if (!r.ok) {
+          status.textContent = 'Error: '+(j.error || r.statusText);
+          return;
+        }
+        status.textContent = '';
+        const inbox = document.getElementById('inboxContent');
+        inbox.innerHTML = '';
+        if (!j.length) {
+          inbox.textContent = 'No messages';
+          return;
+        }
+        for (const m of j) {
+          const d = new Date(m.created_at);
+          const el = document.createElement('div');
+          el.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';
+          el.style.padding = '14px';
+          el.style.borderRadius = '12px';
+          el.style.marginBottom = '12px';
+          el.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+          el.innerHTML = `<div style="font-size:12px;color:#9aa4b2;margin-bottom:8px">${d.toLocaleString()}</div><div style="white-space:pre-wrap">${m.content}</div>`;
+          inbox.appendChild(el);
+        }
+      } catch (err) {
+        status.textContent = 'Failed to load';
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadInboxMessages);
+
+    // Theme toggle handler
+    document.getElementById('themeBtn').addEventListener('click', async () => {
+      const isLight = document.body.classList.contains('light-theme');
+      const newTheme = isLight ? 'dark' : 'light';
+      
+      try {
+        const res = await fetch('/api/account/update-theme', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify({theme: newTheme})
+        });
+        
+        if (res.ok) {
+          localStorage.setItem('theme', newTheme);
+          document.body.classList.toggle('light-theme');
+          document.getElementById('theme_status').textContent = 'Theme updated!';
+          document.getElementById('theme_status').style.color = '#4ade80';
+          setTimeout(() => {
+            document.getElementById('theme_status').style.color = '#9aa4b2';
+            document.getElementById('theme_status').textContent = '';
+          }, 3000);
+        } else {
+          document.getElementById('theme_status').textContent = 'Failed to update theme';
+          document.getElementById('theme_status').style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        document.getElementById('theme_status').textContent = 'Error updating theme';
+        document.getElementById('theme_status').style.color = '#ff6b6b';
+      }
+    });
+
+    // Toggle recipient link handler
+    document.getElementById('toggleLinkBtn').addEventListener('click', async () => {
+      const status = document.getElementById('link_status');
+      const currentStatus = document.getElementById('linkStatus').textContent.includes('Active');
+      
+      try {
+        const res = await fetch('/api/account/toggle-link', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify({active: !currentStatus})
+        });
+        
+        if (res.ok) {
+          document.getElementById('linkStatus').textContent = !currentStatus ? 'Active' : 'Disabled';
+          status.textContent = !currentStatus ? 'Link enabled!' : 'Link disabled!';
+          status.style.color = '#4ade80';
+          setTimeout(() => {
+            status.style.color = '#9aa4b2';
+            status.textContent = '';
+          }, 3000);
+        } else {
+          status.textContent = 'Failed to update link status';
+          status.style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        status.textContent = 'Error updating link';
+        status.style.color = '#ff6b6b';
+      }
+    });
+
+    // Regenerate link handler
+    document.getElementById('regenerateLinkBtn').addEventListener('click', async () => {
+      const status = document.getElementById('link_status');
+      
+      if (!confirm('Generate a new recipient link? Your old link will no longer work.')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/api/account/regenerate-link', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin'
+        });
+        
+        if (res.ok) {
+          status.textContent = 'New link generated! Reloading...';
+          status.style.color = '#4ade80';
+          setTimeout(() => window.location.reload(), 2000);
+        } else {
+          status.textContent = 'Failed to regenerate link';
+          status.style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        status.textContent = 'Error regenerating link';
+        status.style.color = '#ff6b6b';
+      }
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', loadInboxMessages);
+
+    // Change password handler
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const current = document.getElementById('cp_current').value;
+      const newPass = document.getElementById('cp_new').value;
+      const status = document.getElementById('cp_status');
+      status.textContent = '';
+      
+      if (!current || !newPass) {
+        status.textContent = 'Please fill all fields';
+        return;
+      }
+      if (newPass.length < 6) {
+        status.textContent = 'Password must be at least 6 characters';
+        return;
+      }
+      
+      try {
+        const res = await fetch('/api/account/change-password', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify({currentPassword: current, newPassword: newPass})
+        });
+        const data = await res.json();
+        if (res.ok) {
+          status.textContent = 'Password changed!';
+          status.style.color = '#4ade80';
+          document.getElementById('changePasswordForm').reset();
+          setTimeout(() => {status.style.color = '#9aa4b2'; status.textContent = '';}, 3000);
+        } else {
+          status.textContent = 'Error: ' + data.error;
+          status.style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        status.textContent = 'Failed to change password';
+        status.style.color = '#ff6b6b';
+      }
+    });
+
+    // Delete account handler
+    document.getElementById('deleteAccountForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('da_password').value;
+      const status = document.getElementById('da_status');
+      status.textContent = '';
+      
+      if (!password) {
+        status.textContent = 'Please enter your password';
+        return;
+      }
+      
+      if (!confirm('Are you absolutely sure? This cannot be undone.')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/api/account/delete', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify({password})
+        });
+        const data = await res.json();
+        if (res.ok) {
+          status.textContent = 'Account deleted. Redirecting...';
+          status.style.color = '#4ade80';
+          setTimeout(() => {window.location.href = '/';}, 2000);
+        } else {
+          status.textContent = 'Error: ' + data.error;
+          status.style.color = '#ff6b6b';
+        }
+      } catch (err) {
+        status.textContent = 'Failed to delete account';
+        status.style.color = '#ff6b6b';
+      }
+    });
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

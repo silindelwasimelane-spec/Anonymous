@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign up</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body style="margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);background-attachment:fixed;min-height:100vh;color:#e6eef6;padding:40px">
+  <main style="max-width:640px;margin:32px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+    <h1 style="margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)">Sign up</h1>
+    <form id="signup">
+      <div><label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Username</label><input id="su_user" autocomplete="username" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset"></div>
+      <div><label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Password</label><input id="su_pass" type="password" autocomplete="new-password" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset"></div>
+      <div><label style="display:block;margin-bottom:6px;color:#9aa4b2;font-size:14px">Referral link or code (optional)</label><input id="su_ref" placeholder="https://... or code" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset" /></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px"><button style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Sign up</button><span id="su_status"></span></div>
+    </form>
+    <p style="color:#9aa4b2">Already have an account? <a href="/login" style="color:#667eea;text-decoration:none;font-weight:bold">Log in</a></p>
+  </main>
+  <script>
+    async function post(url, body){
+      const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), credentials: 'same-origin'});
+      return res;
+    }
+    document.getElementById('signup').addEventListener('submit', async (e)=>{
+      e.preventDefault(); const u=document.getElementById('su_user').value, p=document.getElementById('su_pass').value;
+      const st = document.getElementById('su_status'); st.textContent='...';
+      // include ref code if present in URL or from the input
+      const params = new URLSearchParams(window.location.search);
+      let ref = params.get('ref');
+      const inputRef = document.getElementById('su_ref').value.trim();
+      if (inputRef) ref = inputRef;
+      // if user pasted full link, try to extract code
+      if (ref && ref.includes('/')) {
+        try {
+          const url = new URL(ref, window.location.origin);
+          // accept /signup?ref=... or /u/<recipient> links — extract ref param or last path segment
+          if (url.searchParams.get('ref')) ref = url.searchParams.get('ref');
+          else ref = url.pathname.split('/').filter(Boolean).pop();
+        } catch(e) {}
+      }
+      const body = {username:u,password:p};
+      if (ref) body.ref = ref;
+      const r = await post('/api/signup', body);
+      const j = await r.json().catch(()=>({error:'failed'}));
+      if (r.ok) {
+        try { localStorage.setItem('am_user', u); localStorage.setItem('am_recipient', j.recipientLink || ''); } catch(e){}
+        st.innerHTML = 'Created. <a href="/account">Go to account</a>. Your referral code: <strong>' + (j.referralCode||'') + '</strong>';
+        // allow session cookie to be set then redirect
+        setTimeout(()=> window.location.href = '/account', 300);
+      } else st.textContent = 'Error: ' + (j.error||r.statusText);
+    });
+  </script>
+  <script src="nav.js"></script>
+  <footer class="dev-footer"><strong>SiyamThanda SimeLane</strong></footer>
+</body>
+</html>

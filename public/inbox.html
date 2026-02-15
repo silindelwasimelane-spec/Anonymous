@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Inbox</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>main{max-width:760px;margin:24px auto}</style>
+</head>
+<body style="margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);background-attachment:fixed;min-height:100vh;color:#e6eef6;padding:40px">
+  <main style="max-width:760px;margin:24px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+    <h1 style="margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)">Your inbox</h1>
+    <p style="color:#9aa4b2;margin-bottom:12px">Messages sent to your recipient link will appear here.</p>
+
+    <div style="display:flex;gap:12px;align-items:center;margin-top:12px;margin-bottom:16px">
+      <button id="refresh" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Refresh</button>
+      <button id="logout" style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Logout</button>
+      <span id="msg_status"></span>
+    </div>
+
+    <div id="inbox"></div>
+  </main>
+  <script>
+    async function loadMessages() {
+      const s = document.getElementById('msg_status'); s.textContent='loading...';
+      try {
+        const r = await fetch('/api/account/messages', {credentials: 'same-origin'});
+        const j = await r.json().catch(()=>({error:'failed'}));
+        if (!r.ok) { s.textContent = 'Error: '+(j.error||r.statusText); return; }
+        s.textContent=''; const inbox = document.getElementById('inbox'); inbox.innerHTML='';
+        if (!j.length) { inbox.textContent='No messages'; return; }
+        for (const m of j) {
+          const d = new Date(m.created_at);
+          const el = document.createElement('div'); el.className='message'; el.innerHTML = `<div class="meta">${d.toLocaleString()}</div><div class="body">${m.content}</div>`;
+          inbox.appendChild(el);
+        }
+      } catch (err) { s.textContent = 'Failed to load'; }
+    }
+
+    document.getElementById('refresh').addEventListener('click', ()=>{ loadMessages(); });
+    document.getElementById('logout').addEventListener('click', ()=>{
+      fetch('/api/logout', {method:'POST', credentials: 'same-origin'}).finally(()=>{ try{ localStorage.removeItem('am_user'); localStorage.removeItem('am_recipient'); }catch(e){}; window.location.href = '/'; });
+    });
+
+    window.addEventListener('load', ()=>{ loadMessages(); });
+  </script>
+  <footer class="dev-footer"><strong>SiyamThanda SimeLane</strong></footer>
+</body>
+</html>

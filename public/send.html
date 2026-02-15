@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Send anonymous message</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>main{max-width:640px;margin:32px auto}</style>
+</head>
+<body style="margin:0;background:radial-gradient(1200px 600px at 10% 10%, rgba(125,211,252,0.08), transparent), linear-gradient(180deg,#041021,#071026);background-attachment:fixed;min-height:100vh;color:#e6eef6;padding:40px">
+  <main style="max-width:640px;margin:32px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+    <h1 style="margin:0 0 18px;font-size:36px;text-shadow:0 6px 20px rgba(0,0,0,0.6)">Send a message</h1>
+    <p id="targetInfo" style="color:#9aa4b2;margin-bottom:12px"></p>
+    <form id="sendForm">
+      <textarea id="content" placeholder="Write your anonymous message" maxlength="500" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(102,126,234,0.4);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:inherit;margin-bottom:12px;box-shadow:0 0 12px rgba(102,126,234,0.2) inset;min-height:120px;font-family:inherit"></textarea>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px"><button style="background:linear-gradient(90deg, #667eea, #764ba2);border:none;padding:10px 16px;border-radius:12px;color:white;cursor:pointer;box-shadow:0 6px 18px rgba(102,126,234,0.3), 0 0 18px rgba(118,75,162,0.2);font-weight:bold">Send</button><span id="status"></span></div>
+    </form>
+  </main>
+  <script>
+    const recipientId = window.location.pathname.split('/').pop();
+    document.getElementById('targetInfo').textContent = 'Sending to: ' + recipientId;
+    document.getElementById('sendForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const content = document.getElementById('content').value.trim();
+      if (!content) return;
+      const status = document.getElementById('status');
+      try {
+        const res = await fetch('/api/users/' + encodeURIComponent(recipientId) + '/messages', {
+          method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({content})
+        });
+        if (res.ok) {
+          status.textContent = 'Sent!';
+          document.getElementById('content').value = '';
+        } else {
+          const j = await res.json().catch(()=>({error:'unknown'}));
+          status.textContent = 'Error: ' + (j.error || res.statusText);
+        }
+      } catch (err) { status.textContent = 'Failed to send'; }
+    });
+  </script>
+  <script src="nav.js"></script>
+  <footer class="dev-footer"><strong>SiyamThanda SimeLane</strong></footer>
+</body>
+</html>
